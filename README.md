@@ -6,6 +6,10 @@ A high-quality Model Context Protocol (MCP) server for RPG Maker MZ integration.
 
 - **Actor Management**: Create, read, update, and search actors
 - **Item/Equipment Management**: Manage items, weapons, armors, and skills
+- **Skill Creation**: Create custom skills with natural language (NEW!)
+  - Damage skills, healing skills, buffs, debuffs, status effects
+  - Simplified helpers for common skill types
+  - Full customization support
 - **Map Management**: Access and modify map data, tiles, and properties
 - **Event Management**: Create, update, and manage map events and commands
 - **System Configuration**: Update game settings, variables, switches, and vocabulary
@@ -86,6 +90,17 @@ Add to your Claude Desktop configuration file:
 - `update_item` - Update an item's properties
 - `search_items` - Search items by name or description
 
+### Skill Tools (NEW!)
+
+- `get_skill` - Get a specific skill by ID
+- `create_skill` - Create a custom skill with full control
+- `create_damage_skill` - Create a damage-dealing skill (simplified)
+- `create_healing_skill` - Create a healing skill (simplified)
+- `create_buff_skill` - Create a buff skill (simplified)
+- `create_state_skill` - Create a state-inflicting skill (simplified)
+- `update_skill` - Update a skill's properties
+- `search_skills` - Search skills by name or description
+
 ### Map Tools
 
 - `get_map` - Get map data by ID
@@ -151,6 +166,24 @@ Change the game title to "My Epic Adventure"
 ```
 
 Claude will use the `update_game_title` tool to update the system data.
+
+### Example 6: Create a Custom Skill
+
+```
+Create a fire magic skill called "Fireball" that costs 15 MP,
+targets a single enemy, and deals "a.mat * 4 - b.mdf * 2" damage
+```
+
+Claude will use the `create_damage_skill` tool to create the skill.
+
+### Example 7: Create a Healing Skill
+
+```
+Create a group healing spell called "Mass Heal" that costs 30 MP,
+targets all allies, and heals "a.mat * 3 + 100" HP
+```
+
+Claude will use the `create_healing_skill` tool to create the healing skill.
 
 ## Data Structure Reference
 

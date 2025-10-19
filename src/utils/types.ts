@@ -52,6 +52,12 @@ export interface Skill {
   damage: Damage;
   effects: Effect[];
   note: string;
+  message1: string;
+  message2: string;
+  requiredWtypeId1: number;
+  requiredWtypeId2: number;
+  messageType: number;
+  traits: Trait[];
 }
 
 export interface Weapon {

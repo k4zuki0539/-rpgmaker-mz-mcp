@@ -13,6 +13,7 @@ import * as actorTools from './tools/actorTools.js';
 import * as itemTools from './tools/itemTools.js';
 import * as mapTools from './tools/mapTools.js';
 import * as systemTools from './tools/systemTools.js';
+import * as skillTools from './tools/skillTools.js';
 
 /**
  * RPG Maker MZ MCP Server
@@ -205,6 +206,135 @@ class RPGMakerMZServer {
         inputSchema: {
           type: 'object',
           properties: {},
+        },
+      },
+      {
+        name: 'get_skill',
+        description: 'Get a specific skill by ID',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            skillId: { type: 'number', description: 'The ID of the skill to retrieve' },
+          },
+          required: ['skillId'],
+        },
+      },
+      {
+        name: 'create_skill',
+        description: 'Create a new skill with custom properties',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Skill name' },
+            description: { type: 'string', description: 'Skill description' },
+            iconIndex: { type: 'number', description: 'Icon index (0-1000+)' },
+            mpCost: { type: 'number', description: 'MP cost' },
+            tpCost: { type: 'number', description: 'TP cost' },
+            scope: { type: 'number', description: 'Target scope (1=enemy single, 2=enemy all, 7=ally all, etc.)' },
+            damage: {
+              type: 'object',
+              description: 'Damage configuration',
+              properties: {
+                type: { type: 'number', description: 'Damage type (0=none, 1=HP damage, 3=HP recover, etc.)' },
+                elementId: { type: 'number', description: 'Element ID (0=none, 2=fire, 3=ice, etc.)' },
+                formula: { type: 'string', description: 'Damage formula (e.g., "a.mat * 4 - b.mdf * 2")' },
+              },
+            },
+            effects: {
+              type: 'array',
+              description: 'Skill effects (buffs, debuffs, states, etc.)',
+            },
+            animationId: { type: 'number', description: 'Animation ID' },
+            message1: { type: 'string', description: 'Battle message' },
+            stypeId: { type: 'number', description: 'Skill type (1=magic, 2=special, etc.)' },
+          },
+          required: ['name'],
+        },
+      },
+      {
+        name: 'create_damage_skill',
+        description: 'Create a damage-dealing skill (simplified)',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Skill name' },
+            damageFormula: { type: 'string', description: 'Damage formula (e.g., "a.mat * 4")' },
+            mpCost: { type: 'number', description: 'MP cost' },
+            scope: { type: 'number', description: 'Target scope (1=enemy single, 2=enemy all)' },
+            elementId: { type: 'number', description: 'Element ID (0=none, 2=fire, 3=ice, 4=thunder, etc.)' },
+            description: { type: 'string', description: 'Skill description' },
+          },
+          required: ['name', 'damageFormula', 'mpCost', 'scope'],
+        },
+      },
+      {
+        name: 'create_healing_skill',
+        description: 'Create a healing skill (simplified)',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Skill name' },
+            healFormula: { type: 'string', description: 'Heal formula (e.g., "a.mat * 3 + 100")' },
+            mpCost: { type: 'number', description: 'MP cost' },
+            scope: { type: 'number', description: 'Target scope (7=ally all, 11=user)' },
+            description: { type: 'string', description: 'Skill description' },
+          },
+          required: ['name', 'healFormula', 'mpCost', 'scope'],
+        },
+      },
+      {
+        name: 'create_buff_skill',
+        description: 'Create a buff skill (simplified)',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Skill name' },
+            buffType: { type: 'number', description: 'Buff type (2=ATK, 3=DEF, 4=MAT, 5=MDF, 6=AGI)' },
+            turns: { type: 'number', description: 'Number of turns the buff lasts' },
+            mpCost: { type: 'number', description: 'MP cost' },
+            scope: { type: 'number', description: 'Target scope (7=ally all, 11=user)' },
+            description: { type: 'string', description: 'Skill description' },
+          },
+          required: ['name', 'buffType', 'turns', 'mpCost', 'scope'],
+        },
+      },
+      {
+        name: 'create_state_skill',
+        description: 'Create a state-inflicting skill (poison, sleep, etc.)',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Skill name' },
+            stateId: { type: 'number', description: 'State ID (4=poison, 5=blind, 6=silence, 8=confusion, etc.)' },
+            chance: { type: 'number', description: 'Success chance (0.0-1.0)' },
+            mpCost: { type: 'number', description: 'MP cost' },
+            scope: { type: 'number', description: 'Target scope (1=enemy single, 2=enemy all)' },
+            description: { type: 'string', description: 'Skill description' },
+          },
+          required: ['name', 'stateId', 'chance', 'mpCost', 'scope'],
+        },
+      },
+      {
+        name: 'update_skill',
+        description: 'Update a skill\'s properties',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            skillId: { type: 'number', description: 'The skill ID to update' },
+            updates: { type: 'object', description: 'Properties to update' },
+          },
+          required: ['skillId', 'updates'],
+        },
+      },
+      {
+        name: 'search_skills',
+        description: 'Search skills by name or description',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            searchTerm: { type: 'string', description: 'Search term' },
+          },
+          required: ['searchTerm'],
         },
       },
       {
@@ -465,6 +595,55 @@ class RPGMakerMZServer {
         return await itemTools.updateItem(this.projectPath, args.itemId, args.updates);
       case 'search_items':
         return await itemTools.searchItems(this.projectPath, args.searchTerm);
+
+      // Skill Tools
+      case 'get_skill':
+        return await skillTools.getSkill(this.projectPath, args.skillId);
+      case 'create_skill':
+        return await skillTools.createSkill(this.projectPath, args);
+      case 'create_damage_skill':
+        return await skillTools.createDamageSkill(
+          this.projectPath,
+          args.name,
+          args.damageFormula,
+          args.mpCost,
+          args.scope,
+          args.elementId,
+          args.description
+        );
+      case 'create_healing_skill':
+        return await skillTools.createHealingSkill(
+          this.projectPath,
+          args.name,
+          args.healFormula,
+          args.mpCost,
+          args.scope,
+          args.description
+        );
+      case 'create_buff_skill':
+        return await skillTools.createBuffSkill(
+          this.projectPath,
+          args.name,
+          args.buffType,
+          args.turns,
+          args.mpCost,
+          args.scope,
+          args.description
+        );
+      case 'create_state_skill':
+        return await skillTools.createStateSkill(
+          this.projectPath,
+          args.name,
+          args.stateId,
+          args.chance,
+          args.mpCost,
+          args.scope,
+          args.description
+        );
+      case 'update_skill':
+        return await skillTools.updateSkill(this.projectPath, args.skillId, args.updates);
+      case 'search_skills':
+        return await skillTools.searchSkills(this.projectPath, args.searchTerm);
 
       // Map Tools
       case 'get_map':
