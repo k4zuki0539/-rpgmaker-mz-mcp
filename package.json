@@ -1,0 +1,31 @@
+{
+  "name": "rpgmaker-mz-mcp",
+  "version": "1.0.0",
+  "description": "High-quality MCP server for RPG Maker MZ integration - manage game data, maps, events, and plugins",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "rpgmaker-mz-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "rpgmaker",
+    "rpg-maker-mz",
+    "game-development",
+    "model-context-protocol"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "typescript": "^5.7.2"
+  }
+}
